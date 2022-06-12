@@ -13,7 +13,7 @@
 // @homepageURL  https://github.com/ChrisRaven/Flywire-Permanent-colors
 // ==/UserScript==
 
-const DEV = true;
+const DEV = false;
 
 
 if (unsafeWindow.dockIsReady) return main()
