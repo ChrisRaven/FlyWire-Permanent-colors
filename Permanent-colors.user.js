@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Permanent colors
 // @namespace    KrzysztofKruk-FlyWire
-// @version      0.1
+// @version      0.1.1
 // @description  Permanents colors for segments
 // @author       Krzysztof Kruk
 // @match        https://ngl.flywire.ai/*
@@ -46,8 +46,9 @@ function main() {
         contextmenu: e => rightClickHandler(e),
         input: e => {
           e.preventDefault()
-          updateColor(e.target.value)
-        }
+          updateColor(e)
+        },
+        change: e => saveColor(e)
       }
     }
   })
@@ -59,7 +60,32 @@ function main() {
   ids = getIds() || {}
 
   recolorPatches()
+  restoreColors()
 }
+
+
+function saveColor(e) {
+  Dock.ls.set('-pc-color-patch-' + e.target.id, e.target.value)
+}
+
+function restoreColors() {
+  for (let i = 1; i <= 4; i++) {
+    let color = Dock.ls.get('-pc-color-patch-permanent-colors-' + i)
+    let patch = document.getElementById('permanent-colors-' + i)
+    if (!color) {
+      switch (i) {
+        // it has to be 6-digits values because of the <input type="color"> specs
+        case 1: color = '#FF0000'; break
+        case 2: color = '#00FF00'; break
+        case 3: color = '#0000FF'; break
+        case 4: color = '#FFFF00'; break
+      }
+    }
+    patch.value = color
+    patch.parentElement.style.backgroundColor = color
+  }
+}
+
 
 function recolorPatches() {
   document.querySelectorAll('.permanent-colors-wrapper').forEach(el => {
@@ -145,6 +171,12 @@ function rgbToObj(color) {
 function changeColor(rootId, color) {
   let rootIdObj = stringToUint64(rootId)
   let graphLayer = viewer.layerManager.getLayerByName('Production-segmentation_with_graph')
+  if (!graphLayer) {
+    graphLayer = viewer.layerManager.getLayerByName('Sandbox-segmentation-FOR PRACTICE ONLY')
+  }
+  if (!graphLayer) {
+    graphLayer = viewer.layerManager.getLayerByName('Testing-segmentation-FOR TEST TAKING ONLY')
+  }
   let colors = graphLayer.layer_.displayState.segmentStatedColors
 
   colorObj = rgbToObj(color)
@@ -176,8 +208,10 @@ function changeColor(rootId, color) {
 }
 
 
-function updateColor(newColor) {
-  changeColor(ids.root, newColor)
+function updateColor(e) {
+  changeColor(ids.root, e.target.value)
+  e.target.parentElement.style.backgroundColor = e.target.value
+
 }
 
 
