@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Permanent colors
 // @namespace    KrzysztofKruk-FlyWire
-// @version      0.1.1
+// @version      0.1.2
 // @description  Permanents colors for segments
 // @author       Krzysztof Kruk
 // @match        https://ngl.flywire.ai/*
@@ -176,6 +176,13 @@ function changeColor(rootId, color) {
   }
   if (!graphLayer) {
     graphLayer = viewer.layerManager.getLayerByName('Testing-segmentation-FOR TEST TAKING ONLY')
+  }
+  if (!graphLayer) {
+    graphLayer = viewer.layerManager.getLayerByName('Production Segmentation')
+  }
+  if (!graphLayer) {
+    console.log('Permanent colors: unknown graph layer')
+    return
   }
   let colors = graphLayer.layer_.displayState.segmentStatedColors
 
