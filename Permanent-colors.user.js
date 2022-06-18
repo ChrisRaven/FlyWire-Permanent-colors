@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Permanent colors
 // @namespace    KrzysztofKruk-FlyWire
-// @version      0.1.2.2
+// @version      0.1.2.3
 // @description  Permanents colors for segments
 // @author       Krzysztof Kruk
 // @match        https://ngl.flywire.ai/*
@@ -256,6 +256,7 @@ document.addEventListener('fetch', e => {
   let response = e.detail.response
   let url = e.detail.url
   if (!response || !url) return
+  if (!currentColorPatchId) return // FIXME: sometimes happens for an unknown reason
   let color = document.getElementById(currentColorPatchId).value
 
   if (url.includes('split?') || url.includes('merge?')) {
