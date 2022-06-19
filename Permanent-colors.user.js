@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Permanent colors
 // @namespace    KrzysztofKruk-FlyWire
-// @version      0.1.2.3
+// @version      0.1.3
 // @description  Permanents colors for segments
 // @author       Krzysztof Kruk
 // @match        https://ngl.flywire.ai/*
@@ -24,6 +24,7 @@ document.head.appendChild(script)
 
 let wait = setInterval(() => {
   if (unsafeWindow.dockIsReady) {
+    unsafeWindow.GM_xmlhttpRequest = GM_xmlhttpRequest
     clearInterval(wait)
     main()
   }
@@ -108,68 +109,8 @@ function saveIds() {
 }
 
 
-function getSegmentId(x, y, z, callback) {
-  GM_xmlhttpRequest({
-    method: 'POST',
-    url: 'https://services.itanna.io/app/transform-service/query/dataset/flywire_190410/s/2/values_array_string_response',
-    data: `{"x":[${x}],"y":[${y}],"z":[${z}]}`,
-    headers: {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json'
-    },
-    onload: response => response && callback(JSON.parse(response.response).values[0][0])
-  })
-}
-
-function getRootId(supervoxelId, callback) {
-  let authToken = localStorage.getItem('auth_token')
-
-  fetch(`https://prodv1.flywire-daf.com/segmentation/api/v1/table/fly_v31/node/${supervoxelId}/root?int64_as_str=1&middle_auth_token=${authToken}`)
-    .then(response => response.json())
-    .then(response => {
-      if (!response) return
-      ids.root = response.root_id
-      saveIds()
-      callback(ids.root)
-    })
-}
-
-
-function stringToUint64(s) {
-  if (!s) return { low: 0, high: 0 }
-
-  const MAX_INT_LENGTH = 9
-  const MAX_HEX_INT_LENGTH = 8
-
-  if (s.length <= MAX_INT_LENGTH) return { low: +s, high: 0 }
-
-  s = BigInt(s).toString(16)
-  if (s.length % 2) {
-    s = '0' + s
-  }
-
-  let low = s.substring(MAX_HEX_INT_LENGTH)
-  let high = s.substring(0, s.length - low.length)
-
-  low = parseInt(low, 16)
-  high = high ? parseInt(high, 16) : 0
-
-  return { low: low, high: high }
-}
-
-
-function rgbToObj(color) {
-  let colorObj = color.substring(1)
-  let r = parseInt(colorObj.substring(0, 2), 16)
-  let g = parseInt(colorObj.substring(2, 4), 16)
-  let b = parseInt(colorObj.substring(4, 6), 16)
-  // color will always be below FFFFFFFF, so there's no need to convert it to Uint64
-  return { low: r * 256 * 256 + g * 256 + b, high: 0 }
-}
-
-
 function changeColor(rootId, color) {
-  let rootIdObj = stringToUint64(rootId)
+  let rootIdObj = Dock.stringToUint64(rootId)
   let graphLayer = viewer.layerManager.getLayerByName('Production-segmentation_with_graph')
   if (!graphLayer) {
     graphLayer = viewer.layerManager.getLayerByName('Sandbox-segmentation-FOR PRACTICE ONLY')
@@ -189,7 +130,7 @@ function changeColor(rootId, color) {
   }
   let colors = graphLayer.layer_.displayState.segmentStatedColors
 
-  colorObj = rgbToObj(color)
+  colorObj = Dock.rgbToUint64(color)
   colors.delete(rootIdObj)
   colors.set(rootIdObj, colorObj)
   graphLayer.layerChanged.dispatch()
@@ -244,11 +185,17 @@ function changeColorByCoords(e) {
                         .map(el => el.trim())
   let color = e.target.value
 
-  getSegmentId(...currentCoords, (segmentId) => {
+  Dock.getSegmentId(...currentCoords, (segmentId) => {
     ids.supervoxel = segmentId
-    saveIds()
-    getRootId(segmentId, rootId => changeColor(rootId, color))
+    Dock.getRootId(segmentId, rootId => getRootIdCallback(rootId))
   })
+}
+
+
+function getRootIdCallback(rootId) {
+  changeColor(rootId, color)
+  ids.root = rootId
+  saveIds()
 }
 
 
@@ -260,8 +207,7 @@ document.addEventListener('fetch', e => {
   let color = document.getElementById(currentColorPatchId).value
 
   if (url.includes('split?') || url.includes('merge?')) {
-    getRootId(ids.supervoxel, rootId => changeColor(rootId, color))
-    
+    Dock.getRootId(ids.supervoxel, rootId => getRootIdCallback(rootId))
   }
   // new cell has been taken
   else if (url.includes('proofreading_drive?')) {
