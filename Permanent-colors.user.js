@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Permanent colors
 // @namespace    KrzysztofKruk-FlyWire
-// @version      0.1.4.1
+// @version      0.1.4.2
 // @description  Permanents colors for segments
 // @author       Krzysztof Kruk
 // @match        https://ngl.flywire.ai/*
@@ -13,7 +13,7 @@
 // @homepageURL  https://github.com/ChrisRaven/FlyWire-Permanent-colors
 // ==/UserScript==
 
-const DEV = true;
+const DEV = false;
 
 
 if (unsafeWindow.dockIsReady) return main()
