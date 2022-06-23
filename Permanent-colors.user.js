@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Permanent colors
 // @namespace    KrzysztofKruk-FlyWire
-// @version      0.1.3.1
+// @version      0.1.4
 // @description  Permanents colors for segments
 // @author       Krzysztof Kruk
 // @match        https://ngl.flywire.ai/*
@@ -187,12 +187,12 @@ function changeColorByCoords(e) {
 
   Dock.getSegmentId(...currentCoords, (segmentId) => {
     ids.supervoxel = segmentId
-    Dock.getRootId(segmentId, rootId => getRootIdCallback(rootId))
+    Dock.getRootId(segmentId, rootId => getRootIdCallback(rootId, color))
   })
 }
 
 
-function getRootIdCallback(rootId) {
+function getRootIdCallback(rootId, color) {
   changeColor(rootId, color)
   ids.root = rootId
   saveIds()
@@ -207,7 +207,7 @@ document.addEventListener('fetch', e => {
   let color = document.getElementById(currentColorPatchId).value
 
   if (url.includes('split?') || url.includes('merge?')) {
-    Dock.getRootId(ids.supervoxel, rootId => getRootIdCallback(rootId))
+    Dock.getRootId(ids.supervoxel, rootId => getRootIdCallback(rootId, color))
   }
   // new cell has been taken
   else if (url.includes('proofreading_drive?')) {
