@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Permanent colors
 // @namespace    KrzysztofKruk-FlyWire
-// @version      0.1.4
+// @version      0.1.4.1
 // @description  Permanents colors for segments
 // @author       Krzysztof Kruk
 // @match        https://ngl.flywire.ai/*
@@ -13,7 +13,7 @@
 // @homepageURL  https://github.com/ChrisRaven/FlyWire-Permanent-colors
 // ==/UserScript==
 
-const DEV = false;
+const DEV = true;
 
 
 if (unsafeWindow.dockIsReady) return main()
@@ -179,10 +179,7 @@ function rightClickHandler(e) {
 
 // manual changing
 function changeColorByCoords(e) {
-  let currentCoords = document
-                        .querySelector('.neuroglancer-position-widget-input').value
-                        .split(',')
-                        .map(el => el.trim())
+  let currentCoords = Dock.getCurrentCoords()  
   let color = e.target.value
 
   Dock.getSegmentId(...currentCoords, (segmentId) => {
