@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Permanent colors
 // @namespace    KrzysztofKruk-FlyWire
-// @version      0.1.4.2
+// @version      0.1.4.3
 // @description  Permanents colors for segments
 // @author       Krzysztof Kruk
 // @match        https://ngl.flywire.ai/*
@@ -13,13 +13,10 @@
 // @homepageURL  https://github.com/ChrisRaven/FlyWire-Permanent-colors
 // ==/UserScript==
 
-const DEV = false;
-
-
 if (unsafeWindow.dockIsReady) return main()
 
 let script = document.createElement('script')
-script.src = DEV ? 'http://127.0.0.1:5501/FlyWire-Dock/Dock.js' : 'https://chrisraven.github.io/FlyWire-Dock/Dock.js'
+script.src = typeof DEV !== 'undefined' && DEV ? 'http://127.0.0.1:5501/FlyWire-Dock/Dock.js' : 'https://chrisraven.github.io/FlyWire-Dock/Dock.js'
 document.head.appendChild(script)
 
 let wait = setInterval(() => {
