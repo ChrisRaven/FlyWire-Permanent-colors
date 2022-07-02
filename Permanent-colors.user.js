@@ -13,11 +13,14 @@
 // @homepageURL  https://github.com/ChrisRaven/FlyWire-Permanent-colors
 // ==/UserScript==
 
-if (unsafeWindow.dockIsReady) return main()
+// if (unsafeWindow.dockIsReady) return main()
 
-let script = document.createElement('script')
-script.src = typeof DEV !== 'undefined' && DEV ? 'http://127.0.0.1:5501/FlyWire-Dock/Dock.js' : 'https://chrisraven.github.io/FlyWire-Dock/Dock.js'
-document.head.appendChild(script)
+if (!document.getElementById('dock-script')) {
+  let script = document.createElement('script')
+  script.id = 'dock-script'
+  script.src = typeof DEV !== 'undefined' && DEV ? 'http://127.0.0.1:5501/FlyWire-Dock/Dock.js' : 'https://chrisraven.github.io/FlyWire-Dock/Dock.js'
+  document.head.appendChild(script)
+}
 
 let wait = setInterval(() => {
   if (unsafeWindow.dockIsReady) {
