@@ -13,8 +13,6 @@
 // @homepageURL  https://github.com/ChrisRaven/FlyWire-Permanent-colors
 // ==/UserScript==
 
-// if (unsafeWindow.dockIsReady) return main()
-
 if (!document.getElementById('dock-script')) {
   let script = document.createElement('script')
   script.id = 'dock-script'
