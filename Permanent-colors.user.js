@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Permanent colors
 // @namespace    KrzysztofKruk-FlyWire
-// @version      0.1.4.3
+// @version      0.1.5
 // @description  Permanents colors for segments
 // @author       Krzysztof Kruk
 // @match        https://ngl.flywire.ai/*
@@ -109,23 +109,27 @@ function saveIds() {
 
 function changeColor(rootId, color) {
   let rootIdObj = Dock.stringToUint64(rootId)
-  let graphLayer = viewer.layerManager.getLayerByName('Production-segmentation_with_graph')
-  if (!graphLayer) {
-    graphLayer = viewer.layerManager.getLayerByName('Sandbox-segmentation-FOR PRACTICE ONLY')
-  }
-  if (!graphLayer) {
-    graphLayer = viewer.layerManager.getLayerByName('Testing-segmentation-FOR TEST TAKING ONLY')
-  }
-  if (!graphLayer) {
-    graphLayer = viewer.layerManager.getLayerByName('Production segmentation')
-  }
-  if (!graphLayer) {
-    graphLayer = viewer.layerManager.getLayerByName('Production')
-  }
-  if (!graphLayer) {
-    console.log('Permanent colors: unknown graph layer')
-    return
-  }
+  // let graphLayer = viewer.layerManager.getLayerByName('Production-segmentation_with_graph')
+  // if (!graphLayer) {
+  //   graphLayer = viewer.layerManager.getLayerByName('Sandbox-segmentation-FOR PRACTICE ONLY')
+  // }
+  // if (!graphLayer) {
+  //   graphLayer = viewer.layerManager.getLayerByName('Testing-segmentation-FOR TEST TAKING ONLY')
+  // }
+  // if (!graphLayer) {
+  //   graphLayer = viewer.layerManager.getLayerByName('Production segmentation')
+  // }
+  // if (!graphLayer) {
+  //   graphLayer = viewer.layerManager.getLayerByName('Production')
+  // }
+  // if (!graphLayer) {
+  //   console.log('Permanent colors: unknown graph layer')
+  //   return
+  // }
+
+  let graphLayer = Dock.layers.getByType('segmentation_with_graph', false)[0]
+  if (!graphLayer) return console.log('Permanent colors: incorrect graph layer')
+
   let colors = graphLayer.layer_.displayState.segmentStatedColors
 
   colorObj = Dock.rgbToUint64(color)
@@ -211,6 +215,7 @@ document.addEventListener('fetch', e => {
       root: response.root_id
     }
     saveIds()
+    viewer.selectedLayer.layer.layer.displayState.segmentStatedColors.hashTable.clear()
     changeColor(ids.root, color)
   }
 })
