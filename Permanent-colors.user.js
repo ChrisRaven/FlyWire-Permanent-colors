@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Permanent colors
 // @namespace    KrzysztofKruk-FlyWire
-// @version      0.1.5
+// @version      0.1.6
 // @description  Permanents colors for segments
 // @author       Krzysztof Kruk
 // @match        https://ngl.flywire.ai/*
