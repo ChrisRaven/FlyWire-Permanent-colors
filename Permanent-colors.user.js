@@ -1,15 +1,15 @@
 // ==UserScript==
 // @name         Permanent colors
 // @namespace    KrzysztofKruk-FlyWire
-// @version      0.1.6
+// @version      0.1.6.1
 // @description  Permanents colors for segments
 // @author       Krzysztof Kruk
 // @match        https://ngl.flywire.ai/*
 // @grant        GM_xmlhttpRequest
 // @grant        unsafeWindow
 // @connect      services.itanna.io
-// @updateURL    https://raw.githubusercontent.com/ChrisRaven/FlyWire-Permanent-colors/main/permanentcolors.user.js
-// @downloadURL  https://raw.githubusercontent.com/ChrisRaven/FlyWire-Permanent-colors/main/permanentcolors.user.js
+// @updateURL    https://raw.githubusercontent.com/ChrisRaven/FlyWire-Permanent-colors/main/Permanent-colors.user.js
+// @downloadURL  https://raw.githubusercontent.com/ChrisRaven/FlyWire-Permanent-colors/main/Permanent-colors.user.js
 // @homepageURL  https://github.com/ChrisRaven/FlyWire-Permanent-colors
 // ==/UserScript==
 
