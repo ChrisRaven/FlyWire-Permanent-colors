@@ -32,6 +32,27 @@ let wait = setInterval(() => {
 let ids = { supervoxel: null, root: null }
 let currentColorPatchId = 'permanent-colors-1'
 
+
+
+function fix_segmentColors_2022_07_15() {
+  if (Dock.ls.get('fix_segmentColors_2022_07_15') === 'fixed') return
+
+  Object.entries(localStorage).forEach(entry => {
+    if (entry[0].includes('neuroglancerSaveState_v2-')) {
+      let e = JSON.parse(entry[1])
+      if (e.state && e.state.layers) {
+        e.state.layers.forEach(layer => {
+          if (layer.type === 'segmentation_with_graph' && layer.segmentColors) {
+            layer.segmentColors = {}
+            localStorage.setItem(entry[0], JSON.stringify(e))
+          }
+        })
+      }
+    }
+  })
+  Dock.ls.set('fix_segmentColors_2022_07_15', 'fixed')
+}
+
 function main() {
   let dock = new Dock()
 
@@ -60,6 +81,8 @@ function main() {
 
   recolorPatches()
   restoreColors()
+
+  fix_segmentColors_2022_07_15()
 }
 
 
@@ -128,7 +151,7 @@ function changeColor(rootId, color) {
   // }
 
   let graphLayer = Dock.layers.getByType('segmentation_with_graph', false)[0]
-  if (!graphLayer) return console.log('Permanent colors: incorrect graph layer')
+  if (!graphLayer) return console.log('Permanent colors: missing graph layer')
 
   let colors = graphLayer.layer_.displayState.segmentStatedColors
 
@@ -215,7 +238,7 @@ document.addEventListener('fetch', e => {
       root: response.root_id
     }
     saveIds()
-    viewer.selectedLayer.layer.layer.displayState.segmentStatedColors.hashTable.clear()
+    viewer.selectedLayer.layer.layer.displayState.segmentStatedColors.clear()
     changeColor(ids.root, color)
   }
 })
