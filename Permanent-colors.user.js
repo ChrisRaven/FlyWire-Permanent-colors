@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Permanent colors
 // @namespace    KrzysztofKruk-FlyWire
-// @version      0.1.6.1
+// @version      0.1.7
 // @description  Permanents colors for segments
 // @author       Krzysztof Kruk
 // @match        https://ngl.flywire.ai/*
@@ -231,14 +231,15 @@ document.addEventListener('fetch', e => {
   if (url.includes('split?') || url.includes('merge?')) {
     Dock.getRootId(ids.supervoxel, rootId => getRootIdCallback(rootId, color))
   }
-  // new cell has been taken
+  // new cell has been claimed
   else if (url.includes('proofreading_drive?')) {
     ids = {
       supervoxel: response.supervoxel_id,
       root: response.root_id
     }
     saveIds()
-    viewer.selectedLayer.layer.layer.displayState.segmentStatedColors.clear()
+    Dock.layers.getByType('segmentation_with_graph', false)[0].layer.displayState.segmentStatedColors.clear()
+    // viewer.selectedLayer.layer.layer.displayState.segmentStatedColors.clear()
     changeColor(ids.root, color)
   }
 })
