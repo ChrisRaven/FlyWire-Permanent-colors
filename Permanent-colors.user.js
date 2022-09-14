@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Permanent colors
 // @namespace    KrzysztofKruk-FlyWire
-// @version      0.1.7
+// @version      0.1.8
 // @description  Permanents colors for segments
 // @author       Krzysztof Kruk
 // @match        https://ngl.flywire.ai/*
@@ -116,7 +116,6 @@ function recolorPatches() {
       el.classList.add('permanent-colors-wrapper-selected')
     }
   })
-
 }
 
 
@@ -131,39 +130,8 @@ function saveIds() {
 
 
 function changeColor(rootId, color) {
-  let rootIdObj = Dock.stringToUint64(rootId)
-  // let graphLayer = viewer.layerManager.getLayerByName('Production-segmentation_with_graph')
-  // if (!graphLayer) {
-  //   graphLayer = viewer.layerManager.getLayerByName('Sandbox-segmentation-FOR PRACTICE ONLY')
-  // }
-  // if (!graphLayer) {
-  //   graphLayer = viewer.layerManager.getLayerByName('Testing-segmentation-FOR TEST TAKING ONLY')
-  // }
-  // if (!graphLayer) {
-  //   graphLayer = viewer.layerManager.getLayerByName('Production segmentation')
-  // }
-  // if (!graphLayer) {
-  //   graphLayer = viewer.layerManager.getLayerByName('Production')
-  // }
-  // if (!graphLayer) {
-  //   console.log('Permanent colors: unknown graph layer')
-  //   return
-  // }
-
-  let graphLayer = Dock.layers.getByType('segmentation_with_graph', false)[0]
-  if (!graphLayer) return console.log('Permanent colors: missing graph layer')
-
-  let colors = graphLayer.layer_.displayState.segmentStatedColors
-
-  colorObj = Dock.rgbToUint64(color)
-  colors.delete(rootIdObj)
-  colors.set(rootIdObj, colorObj)
-  graphLayer.layerChanged.dispatch()
-
-  let waitUntilPanelVisible
-  // we have to wait, until the right panel is visible or until refresh...
-  let waitUntilPanelVisibleCallback = () => {
-    let segmentButton = document.querySelector(`button[data-seg-id="${rootId}"]`)
+  function updateColors() {
+    const segmentButton = document.querySelector(`button[data-seg-id="${rootId}"]`)
     if (!segmentButton) return
     let colorSelector = segmentButton.nextSibling
 
@@ -171,16 +139,13 @@ function changeColor(rootId, color) {
       colorSelector = colorSelector.nextSibling
     }
 
-    segmentButton.style.backgroundColor = color
-    segmentButton.style.setProperty('--defBtnColor', color);
-    segmentButton.style.setProperty('--actBtnColor', color);
     colorSelector.value = color
-    clearInterval(waitUntilPanelVisible)
+    const event = new Event('change')
+    colorSelector.dispatchEvent(event)
+    viewer.layerManager.layersChanged.dispatch()
   }
 
-  // ... but we can try to do the changing right away
-  waitUntilPanelVisibleCallback()
-  waitUntilPanelVisible = setTimeout(() => waitUntilPanelVisibleCallback, 1000)  
+  Dock.addToRightTab('segmentation_with_graph', 'rendering', updateColors)
 }
 
 
@@ -209,7 +174,7 @@ function changeColorByCoords(e) {
 
   Dock.getSegmentId(...currentCoords, (segmentId) => {
     ids.supervoxel = segmentId
-    Dock.getRootId(segmentId, rootId => getRootIdCallback(rootId, color))
+    Dock.getRootId(segmentId, rootId => rootId && getRootIdCallback(rootId, color))
   })
 }
 
@@ -227,9 +192,8 @@ document.addEventListener('fetch', e => {
   if (!response || !url) return
   if (!currentColorPatchId) return // FIXME: sometimes happens for an unknown reason
   let color = document.getElementById(currentColorPatchId).value
-
   if (url.includes('split?') || url.includes('merge?')) {
-    Dock.getRootId(ids.supervoxel, rootId => getRootIdCallback(rootId, color))
+    Dock.getRootId(ids.supervoxel, rootId => rootId && getRootIdCallback(rootId, color))
   }
   // new cell has been claimed
   else if (url.includes('proofreading_drive?')) {
