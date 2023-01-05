@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Permanent colors
 // @namespace    KrzysztofKruk-FlyWire
-// @version      0.1.8
+// @version      0.1.9
 // @description  Permanents colors for segments
 // @author       Krzysztof Kruk
 // @match        https://ngl.flywire.ai/*
@@ -133,11 +133,8 @@ function changeColor(rootId, color) {
   function updateColors() {
     const segmentButton = document.querySelector(`button[data-seg-id="${rootId}"]`)
     if (!segmentButton) return
-    let colorSelector = segmentButton.nextSibling
 
-    while (colorSelector && colorSelector.type !== 'color') {
-      colorSelector = colorSelector.nextSibling
-    }
+    const colorSelector = segmentButton.parentElement.getElementsByClassName('segment-color-selector')[0]
 
     colorSelector.value = color
     const event = new Event('change')
@@ -172,7 +169,7 @@ function changeColorByCoords(e) {
   let currentCoords = Dock.getCurrentCoords()  
   let color = e.target.value
 
-  Dock.getSegmentId(...currentCoords, (segmentId) => {
+  Dock.getSegmentId(currentCoords[0] * 4, currentCoords[1] * 4, currentCoords[2], (segmentId) => {
     ids.supervoxel = segmentId
     Dock.getRootId(segmentId, rootId => rootId && getRootIdCallback(rootId, color))
   })
